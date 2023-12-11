@@ -1,5 +1,8 @@
 # cache_miss_example_revised.py
 import random
+import networkx as nx 
+import cProfile
+
 
 def create_large_list(size):
     # Creating a smaller list
@@ -18,5 +21,34 @@ def main():
     # Access the list in a pattern likely to cause cache misses
     access_pattern(large_list, size)
 
+
+def get_neighbors(adjacency_matrix, node):
+    """
+    
+    Get the first-order neighbors of a given node in an adjacency matrix.
+    
+    Parameters:
+    - adjacency_matrix (matrix)
+    - node
+    
+    Returns:
+    - list: List of all first order neighbors of the node.
+    """
+
+    if node < 0 or node >= adjacency_matrix.shape[0]:
+        raise ValueError("Invalid Node")
+    
+    row = adjacency_matrix.getrow(node)
+    neighbors = row.indices.tolist()
+
+    return neighbors
+
+G = nx.gnp_random_graph(1000, .01)
+A = nx.adjacency_matrix(G)
+
+
+
 if __name__ == "__main__":
-    main()
+    for i in range(A.shape[0]):
+        if get_neighbors(A, i) and get_neighbors(A, i)!= [0]:
+            get_neighbors(A, i)
