@@ -1,50 +1,25 @@
-import networkx as nx
 import time
 from RCM import RCM
 from Fiedler import Fiedler
 import scipy.io as sio
 import os
+import scipy.sparse as ss
+import random
 
-# Generate seed For gnp_random_graph
-SEED = int(time.time())
+G_10k = ss.load_npz("/lustre/acslab/users/3281/NSFinalProject/Nathan/data/new_100k_csr.npz")
+node_indices = list(range(G_10k.shape[0]))
 
-# G = nx.gnp_random_graph(1000, .00001, SEED)
-# G = nx.gnp_random_graph(10000, .00001, SEED)
-# G = nx.gnp_random_graph(100000, .0001, SEED)
-# G = nx.gnp_random_graph(1000000, .0001, SEED)
-
-
-def get_neighbors(adjacency_matrix, node):
-
-    if node < 0 or node >= len(adjacency_matrix):
-        # Node index out of bounds
-        return []
-
-    neighbors = []
-    for i in range(len(adjacency_matrix[node])):
-        if adjacency_matrix[[node], [i]] != 0:
-            neighbors.append(i)
-
-    return neighbors
-
-
-
-if __name__=='__main__':
+def get_neighbors_of_neighbors(matrix, node):
     
-    # RCM_G = RCM(G)
-    # Fiedler_G = Fiedler(G).todense()
+    for i in range(G_10k.getnnz()):
+        first_degree_neighbors = list(G_10k[i].nonzero()[1])
+        for neighbor in first_degree_neighbors:
+            second_degree_neighbors = G_10k[neighbor].nonzero()[1]
 
-    # # G = G.todense()
-    # GRAPH_SIZE = len(G)
+def main():
+    random_node = random.shuffle(node_indices)
+    for _ in range(100):
+        get_neighbors_of_neighbors(G_10k, random_node)
 
-    # os.makedirs('data', exist_ok=True)
-    # A = nx.adjacency_matrix(G)
-
-    # sio.mmwrite(f'data/normal_{GRAPH_SIZE}.mtx', A)
-    # sio.mmwrite(f'data/Fiedler_{GRAPH_SIZE}.mtx', Fiedler_G)
-    # sio.mmwrite(f'data/RCM_{GRAPH_SIZE}.mtx', RCM_G)
-
-    G = sio.mmread('data/Fiedler_10000.mtx').todense()
-
-    for i in range(len(G)):
-        get_neighbors(G, i)
+if __name__ == "__main__":
+    main()
